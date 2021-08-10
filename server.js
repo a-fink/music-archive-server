@@ -44,11 +44,11 @@ const server = http.createServer((req, res) => {
   req.on("end", () => { // finished assembling the entire request body
     // Parsing the body of the request depending on the "Content-Type" header
     if (reqBody) {
-      switch(req.headers['content-type']) {
+      switch (req.headers['content-type']) {
         case "application/json":
           req.body = JSON.parse(reqBody);
           break;
-        case "x-www-form-urlencoded":
+        case "application/x-www-form-urlencoded":
           req.body = reqBody
             .split("&")
             .map((keyValuePair) => keyValuePair.split("="))
