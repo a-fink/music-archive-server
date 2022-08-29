@@ -705,5 +705,6 @@ const server = http.createServer((req, res) => {
 });
 
 const port = process.env.PORT || 5000;
+const host = process.env.HOST || '0.0.0.0';
 
-server.listen(port, () => console.log('Server is listening on port', port));
+server.listen(port, host, () => console.log('Server is listening on port', port));
