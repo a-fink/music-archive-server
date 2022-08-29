@@ -704,7 +704,7 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const port = 5000;
+const port = 5500;
 const host = '0.0.0.0'
 
 server.listen(port, host, () => console.log('Server is listening on port', port));
