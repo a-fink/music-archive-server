@@ -337,6 +337,111 @@ const server = http.createServer((req, res) => {
       }
     }
 
+    // all POST requests
+    if(req.method === 'POST'){
+      // all POST requests that begin with /artists
+      if(req.url.startsWith('/artists')){
+        // if urlParts is length 2 then we are adding a new artist
+        if(urlParts.length === 2){
+          // get the artist name from the body of the request
+          const artistName = req.body.name;
+          // get the next available artistId
+          const artistId = getNewArtistId();
+          // make an object for the artist and put the name/artistId in it
+          let newArtist = {};
+          newArtist.name = artistName;
+          newArtist.artistId = artistId;
+
+          // put the new artist we made into the artists object
+          artists[artistId] = newArtist;
+
+          // set headers/status (201 for created) and return the new artist object info as the body
+          res.statusCode = 201;
+          res.setHeader("Content-Type", "application/json");
+          return res.end(JSON.stringify(newArtist));
+        }
+
+        // anything more than 2 is going to be an artist by artistId
+        // get the artistId and find the artist for use in the future checks
+        const artistId = urlParts[2];
+        const foundArtist = artists[artistId];
+
+        // if the artist doesn't exist return an error and stop looking
+        if(!foundArtist){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Artist not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // if url has length 4 and last part is albums we are adding an album to a specified artist
+        if(urlParts.length === 4 && urlParts[3] === 'albums'){
+          // get the album name from the body of the request
+          const albumName = req.body.name;
+          // get the next available albumId
+          const albumId = getNewAlbumId();
+
+          // make an object for the new album and put the name/artistId/albumId in it
+          let newAlbum = {};
+          newAlbum.albumId = albumId;
+          newAlbum.albumName = albumName;
+          newAlbum.artistId = artistId;
+
+          // put the new album we made into the albums object
+          albums[albumId] = newAlbum;
+
+          // set headers/status (201 for created) and return the new album object as the body
+          res.statusCode = 201;
+          res.setHeader("Content-Type", "application/json");
+          return res.end(JSON.stringify(newAlbum));
+        }
+      }
+
+      // all POST requests that begin with /albums
+      if(req.url.startsWith('/albums')){
+        // anything more than 2 is going to be an album by albumId
+        // get the albumId and find the album for use in the future checks
+        const albumId = urlParts[2];
+        const foundAlbum = albums[albumId];
+
+        // if the artist doesn't exist return an error and stop looking
+        if(!foundAlbum){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Album not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // if url has length 4 and last part is songs we are adding a song to a specified album
+        if(urlParts.length === 4 && urlParts[3] === 'songs'){
+          // get the song name, lyrics, and track number from the body
+          const songName = req.body.name;
+          const songLyrics = req.body.lyrics;
+          const trackNumber = req.body.trackNumber;
+          // get the next available songId
+          const songId = getNewSongId();
+
+          // make an object for the new song and put all info in there
+          let newSong = {};
+          newSong.songId = songId;
+          newSong.name = songName;
+          newSong.trackNumber = trackNumber;
+          newSong.albumId = albumId;
+          newSong.lyrics = songLyrics;
+
+          // put the new song we made into the songs object
+          songs[songId] = newSong;
+
+          // set headers/status (201 for created) and return the new song object as the body
+          res.statusCode = 201;
+          res.setHeader("Content-Type", "application/json");
+          return res.end(JSON.stringify(newSong));
+        }
+      }
+    }
+
 
 
     res.statusCode = 404;
