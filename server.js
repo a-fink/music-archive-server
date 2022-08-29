@@ -339,6 +339,9 @@ const server = http.createServer((req, res) => {
 
     // all POST requests
     if(req.method === 'POST'){
+      // create an created at timestamp for use in the following endpoints
+      const createdAt = new Date().toJSON();
+
       // all POST requests that begin with /artists
       if(req.url.startsWith('/artists')){
         // if urlParts is length 2 then we are adding a new artist
@@ -351,6 +354,9 @@ const server = http.createServer((req, res) => {
           let newArtist = {};
           newArtist.name = artistName;
           newArtist.artistId = artistId;
+
+          // add the created at timestamp to it
+          newArtist.createdAt = createdAt;
 
           // put the new artist we made into the artists object
           artists[artistId] = newArtist;
@@ -387,6 +393,9 @@ const server = http.createServer((req, res) => {
           newAlbum.albumId = albumId;
           newAlbum.albumName = albumName;
           newAlbum.artistId = artistId;
+
+          // add the created at timestamp to it
+          newAlbum.createdAt = createdAt;
 
           // put the new album we made into the albums object
           albums[albumId] = newAlbum;
@@ -431,6 +440,9 @@ const server = http.createServer((req, res) => {
           newSong.albumId = albumId;
           newSong.lyrics = songLyrics;
 
+          // add the created at timestamp to it
+          newSong.createdAt = createdAt;
+
           // put the new song we made into the songs object
           songs[songId] = newSong;
 
@@ -439,6 +451,146 @@ const server = http.createServer((req, res) => {
           res.setHeader("Content-Type", "application/json");
           return res.end(JSON.stringify(newSong));
         }
+      }
+    }
+
+    // all PUT/PATCH requests
+    // all of these should have a urlParts length of 3, with index 1 being the collection, and index 2 being the id
+    if(req.method === 'PUT' || req.method === 'PATCH'){
+      // create an updated at timestamp for use in the following endpoints
+      const updatedAt = new Date().toJSON();
+
+      // all PUT/PATCH that begin with /artists (editing an artist's info)
+      if(req.url.startsWith('/artist')){
+        // get the artistId and find the artist for use in the future checks
+        const artistId = urlParts[2];
+        const foundArtist = artists[artistId];
+
+        // if the artist doesn't exist return an error and stop looking
+        if(!foundArtist){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Artist not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // only thing that can be edited for an artist is their name
+        // get the name from the request body and update it on the artist
+        const newName = req.body.name;
+        foundArtist.name = newName;
+
+        // add the upadted at property to the artist and put in the generated timestamp
+        foundArtist.updatedAt = updatedAt;
+
+        // set the headers/status and send back the artist as the body to display the updated info
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify(foundArtist));
+      }
+
+      // all PUT/PATCH requests that begin with /albums (editing an album's info)
+      if(req.url.startsWith('/albums')){
+        // get the albumId and find the album for use in future checks
+        const albumId = urlParts[2];
+        const foundAlbum = albums[albumId];
+
+        // if the album doesn't exist return an error and stop looking
+        if(!foundAlbum){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Album not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // for albums can edit the name or the artist it belongs to
+        // get name and artistId from request body
+        const newName = req.body.name;
+        const newArtistId = req.body.artistId;
+
+        // if a new name was given update it
+        if(newName) foundAlbum.name = newName;
+
+        // if a new artistId was given
+        if(newArtistId){
+          // try to find the artist with that artist id
+          const updatedArtist = artists[newArtistId];
+
+          // if the artist doesn't exist return an error
+          if(!updatedArtist){
+            res.statusCode = 404;
+            res.setHeader('Content-Type', 'application/json');
+
+            const messageObject = {message: "Cannot assign album to an artist that does not exist"};
+            return res.end(JSON.stringify(messageObject));
+          }
+
+          // otherwise update the artist
+          foundAlbum.artistId = newArtistId;
+        }
+
+        // add the upadted at property to the album and put in the generated timestamp
+        foundAlbum.updatedAt = updatedAt;
+
+        // set the headers/status and send back the album as the body to display the updated info
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify(foundAlbum));
+      }
+
+      // all PUT/PATCH requests that begin with /songs
+      if(req.url.startsWith('/songs')){
+        // get the songId and find the song for use in future checks
+        const songId = urlParts[2];
+        const foundSong = songs[songId];
+
+        // if the song doesn't exist return an error and stop looking
+        if(!foundSong){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Song not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // for songs you can update name, lyrics, trackNumber, and albumId
+        // get all those things from the request body
+        const newName = req.body.name;
+        const newLyrics = req.body.lyrics;
+        const newTrackNumber = req.body.trackNumber;
+        const newAlbumId = req.body.albumId;
+
+        // if each of the new things has data in it, update it on the foundSong
+        if(newName) foundSong.name = newName;
+        if(newLyrics) foundSong.lyrics = newLyrics;
+        if(newTrackNumber) foundSong.trackNumber = newTrackNumber;
+
+        // if a new albumId was given
+        if(newAlbumId){
+          // try to find the artist with that artist id
+          const updatedAlbum = albums[newAlbumId];
+
+          // if the artist doesn't exist return an error
+          if(!updatedAlbum){
+            res.statusCode = 404;
+            res.setHeader('Content-Type', 'application/json');
+
+            const messageObject = {message: "Cannot assign song to an album that does not exist"};
+            return res.end(JSON.stringify(messageObject));
+          }
+
+          // otherwise update the album
+          foundSong.albumId = newAlbumId;
+        }
+
+        // add the upadted at property to the song and put in the generated timestamp
+        foundSong.updatedAt = updatedAt;
+
+        // set the headers/status and send back the song as the body to display the updated info
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        return res.end(JSON.stringify(foundSong));
       }
     }
 
