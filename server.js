@@ -215,13 +215,19 @@ const server = http.createServer((req, res) => {
           const artistId = foundAlbum.artistId;
           const artist = artists[artistId];
 
+          // build a copy of the artist to use in the output to not have a circular reference error
+          // (JSON.stringify can't handle circular references and would sometimes throw an error without this step)
+          let newArtistObj = {};
+          newArtistObj.name = artist.name;
+          newArtistObj.artistId = artistId;
+
           // get all the songs from the songs file
           // then filter them by the album id to get the array that belong to this album
           const songsArray = Object.values(songs);
           songsArray.filter(song => song.albumId === Number(albumId));
 
           // add the artist and songs info to the albumObject
-          thisAlbumObject.artist = artist;
+          thisAlbumObject.artist = newArtistObj;
           thisAlbumObject.songs = songsArray;
 
           // stringify the album info, set the header/status and return the body
@@ -325,9 +331,22 @@ const server = http.createServer((req, res) => {
           const artistId = album.artistId;
           const artist = artists[artistId];
 
+          // build a copy of the artist to use in the output to not have a circular reference error
+          // (JSON.stringify can't handle circular references and would sometimes throw an error without this step)
+          let newArtistObj = {};
+          newArtistObj.name = artist.name;
+          newArtistObj.artistId = artistId;
+
+          // build a copy of the album to use in the output to not have a circular reference error
+          // (JSON.stringify can't handle circular references and would sometimes throw an error without this step)
+          let newAlbumObj = {};
+          newAlbumObj.name = album.name;
+          newAlbumObj.albumId = album.albumId;
+          newAlbumObj.artistId = album.artistId;
+
           // add the album and artist info to the song object
-          thisSongObject.album = album;
-          thisSongObject.artist = artist;
+          thisSongObject.album = newAlbumObj;
+          thisSongObject.artist = newArtistObj;
 
           // stringify the song info, set the header/status and return the body
           res.statusCode = 200;
@@ -391,7 +410,7 @@ const server = http.createServer((req, res) => {
           // make an object for the new album and put the name/artistId/albumId in it
           let newAlbum = {};
           newAlbum.albumId = albumId;
-          newAlbum.albumName = albumName;
+          newAlbum.name = albumName;
           newAlbum.artistId = artistId;
 
           // add the created at timestamp to it
