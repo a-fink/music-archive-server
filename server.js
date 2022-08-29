@@ -704,6 +704,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-const port = `0.0.0.0:$PORT`;
+const port = `$PORT`;
 
 server.listen(port, () => console.log('Server is listening on port', port));
