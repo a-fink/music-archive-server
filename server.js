@@ -461,7 +461,7 @@ const server = http.createServer((req, res) => {
       const updatedAt = new Date().toJSON();
 
       // all PUT/PATCH that begin with /artists (editing an artist's info)
-      if(req.url.startsWith('/artist')){
+      if(req.url.startsWith('/artists')){
         // get the artistId and find the artist for use in the future checks
         const artistId = urlParts[2];
         const foundArtist = artists[artistId];
@@ -594,6 +594,88 @@ const server = http.createServer((req, res) => {
       }
     }
 
+    // all DELETE requests
+    // all of these should have a urlParts length of 3, with index 1 being the collection, and index 2 being the id
+    if(req.method === 'DELETE'){
+
+      // all DELETE reqests that begin with /artists (deleting an artist)
+      if(req.url.startsWith('/artists')){
+        // get the artistId and find the artist for use in the future checks
+        const artistId = urlParts[2];
+        const foundArtist = artists[artistId];
+
+        // if the artist doesn't exist return an error and stop looking
+        if(!foundArtist){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Artist not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // otherwise delete the artist from the artists object
+        delete artists[artistId];
+
+        // set header/status and return a message that it was successfully deleted
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+
+        const messageObject = {message: "Successfully deleted"};
+        return res.end(JSON.stringify(messageObject));
+      }
+
+      // all DELETE requests that begin with /albums (delteing an album)
+      if(req.url.startsWith('/albums')){
+        // get the albumId and find the album for use in the future checks
+        const albumId = urlParts[2];
+        const foundAlbum = albums[albumId];
+
+        // if the album doesn't exist return an error and stop looking
+        if(!foundAlbum){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Album not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // otherwise delete the album from the albums object
+        delete albums[albumId];
+
+        // set header/status and return a message that it was successfully deleted
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+
+        const messageObject = {message: "Successfully deleted"};
+        return res.end(JSON.stringify(messageObject));
+      }
+
+      // all DELETE requests that begin with /songs (deleting a song)
+      if(req.url.startsWith('/songs')){
+        // get the songId and find the song for use in the future checks
+        const songId = urlParts[2];
+        const foundSong = songs[songId];
+
+        // if the song doesn't exist return an error and stop looking
+        if(!foundSong){
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+
+          const messageObject = {message: "Song not found"};
+          return res.end(JSON.stringify(messageObject));
+        }
+
+        // otherwise delete the album from the albums object
+        delete songs[songId];
+
+        // set header/status and return a message that it was successfully deleted
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+
+        const messageObject = {message: "Successfully deleted"};
+        return res.end(JSON.stringify(messageObject));
+      }
+    }
 
 
     res.statusCode = 404;
