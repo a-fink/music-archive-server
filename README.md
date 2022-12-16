@@ -2,7 +2,7 @@
 
 ## Features
 - Seed data for artists/albums/songs is loaded from JSON files
-- Server handles GET, POST, PUT/PATCH, and DELETE requests
+- Server handles GET, POST, PUT/PATCH, and DELETE requests on REST API style endpoints
 
 ## Running Project Locally
 1. Clone the project
