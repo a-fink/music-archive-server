@@ -1,29 +1,13 @@
-# Long Practice: API Server for a Music Archive
+# HTTP / JSON Music Archive Server
 
-**Finish the [API docs for a Music Archive practice] before this practice.**
+## Features
+- Seed data for artists/albums/songs is loaded from JSON files
+- Server handles GET, POST, PUT/PATCH, and DELETE requests
 
-In this practice, you will implement the code for the server that you documented
-in the previous [API docs for a Music Archive practice].
-
-## Set up
-
-Clone the project from the [starter].
-
-## Instructions
-
-Take a look at the server code in __server.js__. `GET /artists` is already
-implemented for you. The seed data for artists, albums, and songs are imported
-from the JSON files in the __seeds__ folder. The seed data for `artists`,
-`albums`, and `songs` saved to variables at the top of the __server.js__ file.
-
-Implement the code for the endpoints that you documented in the API docs for a
-Music Archive practice.
-
-After you implement the code for each endpoint, test the endpoint with Postman
-and/or in the browser's "Console" tab using `fetch`.
-
-Make sure your server's request-response for every endpoint matches the example
-server that you used to help you create the API documentation.
-
-[starter]: https://github.com/appacademy/practice-for-week-08-music-archive-server-long-practice
-[API docs for a Music Archive practice]: https://github.com/appacademy/practice-for-week-08-music-archive-docs-long-practice
+## Running Project Locally
+1. Clone the project
+2. `cd` into the project directory in your bash/command line
+3. Run `node server.js` to start the server
+    - Server will listen at http://localhost:5000
+    - navigate to this page to make fetch requests via the console of your browser's dev tools
+    - alternatively you can make calls to this url with a service like Postman
